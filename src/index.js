@@ -2,11 +2,26 @@
 
 import dotenv from "dotenv"
 import connectDB from "./db/index.js"
+import { app } from "./app.js"
 
 dotenv.config({
     path:'./env'
 })
 
+connectDB()
+.then(()=>{
+    app.listen(process.env.PORT || 8000, ()=>{
+        console.log(`listening on port ${process.env.PORT}`);
+    })
+    app.on('error',(err)=>{
+        console.log("error in app: ", err);
+        throw err;
+    })
+})
+.catch((err)=>{
+    console.log("DB connection err: ",err);
+    
+})
 
 
 
@@ -24,5 +39,3 @@ dotenv.config({
 
 */
 // ; if used for cleaning purpose, if ; is not in the lines before the IIFE
-
-connectDB()
