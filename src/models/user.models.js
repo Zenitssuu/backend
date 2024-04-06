@@ -1,4 +1,4 @@
-import mongoose ,{Schema, schema} from "mongoose"
+import mongoose ,{Schema} from "mongoose"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
         },
         watchHistory:[
             {
-                type: Schema.mongoose.Types.objectId,
+                type: mongoose.Schema.Types.ObjectId,
                 ref:"Video"
             }
         ],
@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema(
 // not use arrow fn cz we dont get this. context in arrow fn, make async as process will take some time
 userSchema.pre("save", async function (next){
     if(!this.isModefied("password")) return next();
-    this.password = bcrypt.hash(this.password,10); //10 is no. of rounds
+    this.password = await bcrypt.hash(this.password,10); //10 is no. of rounds
     next()
 });
 
@@ -90,4 +90,4 @@ userSchema.methods.generateRefreshToken = function(){
     )
 }
 
-export const User = mongoose.model('User',userSchema);
+export const User = mongoose.model("User",userSchema);
