@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema(
 
 // not use arrow fn cz we dont get this. context in arrow fn, make async as process will take some time
 userSchema.pre("save", async function (next){
-    if(!this.isModefied("password")) return next();
+    if(!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password,10); //10 is no. of rounds
     next()
 });

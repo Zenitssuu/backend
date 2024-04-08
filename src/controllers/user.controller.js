@@ -19,7 +19,8 @@ const registerUser = asyncHandler(async (req,res) => {
     // check for user creation
     // return response
 
-
+    console.log(req.files);
+    
     const {username,email,fullname,password} = req.body;
     
     // console.log("email: ",email);
@@ -37,19 +38,22 @@ const registerUser = asyncHandler(async (req,res) => {
     if(existedUser){
         throw new apiError(409,"user already exists")
     }
-    console.log(req.files);
-    const avatarLoacalPath = req.files?.avatar[0]?.path;
-    const coverageImagePath = req.files?.coverageImage[0].path;
+    // console.log(req.files);
+    const avatarLoacalPath = req.files?.avatar[0].path;
+    const coverageImagePath = req.files?.coverImage[0].path;
     
+    // console.log(1);
+    
+    const avatar = await uploadOnCloudinary(avatarLoacalPath);
+
+    if(coverageImagePath!==""){
+        const coverageImage = await uploadOnCloudinary(coverageImagePath);
+    }
+
     if(!avatar){
         throw new apiError(400,"avatar file is required");
     }
-    const avatar = await uploadOnCloudinary(avatarLoacalPath);
-    const coverageImage = await uploadOnCloudinary(coverageImagePath);
-
-    if(!avatar){
-        throw new apiError(409,"avatar file is required");
-    }
+   
 
     const user = await User.create({
         fullname,
@@ -65,12 +69,12 @@ const registerUser = asyncHandler(async (req,res) => {
         "-password -refreshToken"
     );
 
-    if(!createdUser){
+    if(!newUser){
         throw new apiError(505,"something went wrong while registering the user");
     }
 
     return res.status(201).json(
-        new apiResponse(200,createdUser,"User registered suucessfully")
+        new apiResponse(200,newUser,"User registered suucessfully")
     )
 
 })
