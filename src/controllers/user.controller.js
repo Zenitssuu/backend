@@ -3,18 +3,20 @@ import { apiError } from "../utils/apiError.js";
 import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { apiResponse } from "../utils/apiresponse.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
-    const accessToken = user.geneteAccessToken();
-    const refreshToken = user.geneteRefreshToken();
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
     return { accessToken, refreshToken };
   } catch (err) {
+    // console.log(err);
     throw new apiError(
       500,
       "something went wrong while generating refresh and access tooken"
@@ -37,7 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // check for user creation
   // return response
 
-  console.log(req.files);
+  // console.log(req.files);
 
   const { username, email, fullname, password } = req.body;
 
@@ -56,9 +58,9 @@ const registerUser = asyncHandler(async (req, res) => {
   if (existedUser) {
     throw new apiError(409, "user already exists");
   }
-  console.log(req.files);
+  // console.log(req.files);
   const avatarLoacalPath = req.files?.avatar[0].path;
-  console.log(avatarLoacalPath);
+  // console.log(avatarLoacalPath);
   // const coverageImagePath = req.files?.coverImage[0].path; //error if coverImage is not given
 
   // console.log(1);
@@ -161,7 +163,7 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-const logOutUser = asyncHandler(async (req, res) => {
+const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -185,4 +187,4 @@ const logOutUser = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, {}, "user is logged Out"));
 });
 
-export { registerUser, loginUser, logOutUser };
+export { registerUser, loginUser, logoutUser };
